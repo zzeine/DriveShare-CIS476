@@ -75,9 +75,9 @@ def register(users):
     
     # collect answers to the 3 security questions
     print("Set your 3 security questions:")
-    q1 = input("Answer to Q1 (What is your favorite color?): ").strip()
-    q2 = input("Answer to Q2 (What city were you born in?): ").strip()
-    q3 = input("Answer to Q3 (What is your mom's name?): ").strip()
+    q1 = input("Q1: What is your favorite color?: ").strip()
+    q2 = input("Q2: What city were you born in?: ").strip()
+    q3 = input("Q3: What is your mom's name?: ").strip()
    
     # determine if user is an owner or renter
     print("Are you registering as an (1) Owner or (2) Renter?")
@@ -215,7 +215,7 @@ def owner_menu(owner, cars, bookings, chatroom, all_users):
 #owner lists a new car using the builder pattrn
 #builder collects car details step by step, director assembles the final object
 def owner_list_car(owner, cars):
-    print("\n=== List a New Car (Builder Pattern) ===")
+    print("\n=== List a New Car ===")
 
     builder = CarListingBuilder()
 
@@ -406,6 +406,9 @@ def make_payment(renter, bookings):
     # record the payment object
     payment = Payment(len(user_bookings) + 1, booking, renter, None, booking.totalPrice)
     print(f"Payment recorded. Amount: ${payment.amount}, Status: {payment.status}")
+    # notify both renter and owner
+    print(f"Notification to {renter.email}: Payment of ${booking.totalPrice} successful!")
+    print(f"Notification to {booking.car.ownerId}: Payment of ${booking.totalPrice} received for {booking.car.model}!")
 
 # Messaging (Mediator)
 def send_message(chatroom, current_user, all_users):
@@ -425,15 +428,16 @@ def send_message(chatroom, current_user, all_users):
         return
 
     receiver = all_users[choice - 1]
-    # prevent user from messaging themselves
     if receiver.email == current_user.email:
         print("You cannot message yourself.")
         return
 
     content = input("Enter your message: ")
 
-    sender_chat = ChatUser(current_user.email, current_user.email, chatroom)
-    receiver_chat = ChatUser(receiver.email, receiver.email, chatroom)
+    # create a fresh chatroom each time so no duplicate registrations
+    fresh_chat = DriveShareChat()
+    sender_chat = ChatUser(current_user.email, current_user.email, fresh_chat)
+    receiver_chat = ChatUser(receiver.email, receiver.email, fresh_chat)
 
     sender_chat.send(content)
 
